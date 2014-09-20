@@ -24,3 +24,25 @@ io.on('connection', function(socket){
     console.log('a user connected');
       
 });
+
+//---------configuring http -----------
+
+// using https server
+var express = require('express');
+var https = require('https');
+var fs = require('fs');
+
+// This line is from the Node.js HTTPS documenttation.
+var options = {
+  key: fs.readFileSync('test/fixtures/keys/agent2-key.pem'),
+  cert: fs.readFileSync('test/fixtures/keys/agent2-cert.pem')
+};
+
+// Create a service (the app object is just a callback).
+var app = express();
+
+// Create an HTTPS service identical to the HTTP service.
+https.createServer(options, app).listen(443);
+
+
+
