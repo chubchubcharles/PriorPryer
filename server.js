@@ -31,8 +31,8 @@ io.on('connection', function(socket){
             if (numPlayers < MAX_PLAYERS) {
                 console.log('adding user');
                 socket.name = name;
-                fbnames.push(name);
-                scores.push(0);
+                fbnames[name] = name;
+                scores[name] = 0;
                 ++numPlayers;
 
                 // get the list of mutual friends and posts
@@ -86,7 +86,7 @@ io.on('connection', function(socket){
             --numPlayers;
             console.log('a user disconnected');
             round = 0;
-            fbnames.splice(name, 0);
-            scores.splice(name, 0);
+            //fbnames.splice(name, 0);
+            //scores.splice(name, 0);
         });
 });
