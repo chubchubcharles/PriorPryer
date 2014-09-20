@@ -1,10 +1,10 @@
 $(function() {
     var socket = io();
     setName();
-var $window = $(window);
+    var $window = $(window);
     var seconds = 60;
 
-  window.fbAsyncInit = function() {
+window.fbAsyncInit = function() {
     FB.init({
       appId      : '261908037266353', // App ID //Remember to hide this appID
       channelURL : 'https://10.21.210.204:8000/channel.html', // Channel File
@@ -18,18 +18,29 @@ var $window = $(window);
     // All your canvas and getLogin stuff here
     //
 
+    // var contentType = document.getElementById('iframe_id').contentWindow.document.body.innerHTML;
+    // console.log(contentType);
+
     FB.getLoginStatus(function(response) {
           if (response.status === 'connected') {
             console.log('Logged in.');
+            FB.api('/me', function(response) {
+            console.log('Good to see you, ' + response.name + '.');
+            });
           }
           else {
+            console.log('User cancelled login or did not fully authorize.');
             FB.login(function(response) {
-              onLogin(response);
-              console.log("Not Logged in.");
-            }, {scope: 'user_friends, email'});
+                //handle response
+
+            }, {
+                scope: 'user_friends, email',
+                return_scopes: true
+            });
           }
     });
-  };
+    //keep putting chrome functions
+  }
 
   // Load the SDK Asynchronously
   (function(d){
@@ -41,16 +52,19 @@ var $window = $(window);
 
     //loads Facebook SDK 
 
-    //asks users to login
-    function onLogin(response) {
-      if (response.status == 'connected') {
-        FB.api('/me?fields=first_name', function(data) {
-          var welcomeBlock = document.getElementById('fb-welcome');
-          welcomeBlock.innerHTML = 'Hello, ' + data.first_name + '!';
-        });
-      }
-    }
-
+    // var socket = io.connect('https://localhost:3000/',{secure: true});
+        // var $currentIFrame = document.getElementById("myframe").contentDocument;
+        // alert($currentIFrame);
+        // var invocation = new XMLHttpRequest();
+        // var url = 'https://';
+   
+        // function callOtherDomain() {
+        //     if(invocation) {    
+        //         invocation.open('GET', url, true);
+        //         invocation.onreadystatechange = handler;
+        //         invocation.send(); 
+        //     }
+        // }
     // var socket = io.connect('https://localhost:3000/',{secure: true});
         // var $currentIFrame = document.getElementById("myframe").contentDocument;
         // alert($currentIFrame);
