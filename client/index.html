@@ -5,6 +5,7 @@
         </head>
     <script src="/socket.io/socket.io.js"></script>
     <script>
+
         var socket = io();
         //emit event
     </script>
@@ -18,9 +19,8 @@
           xfbml      : true,
           version    : 'v2.1'
         });
-
+        
         // ADD ADDITIONAL FACEBOOK CODE HERE
-
         FB.getLoginStatus(function(response) {
           // Check login status on load, and if the user is
           // already logged in, go directly to the welcome message.
@@ -36,7 +36,6 @@
 
         //end of fbAsyncInit()
       };
-
       (function(d, s, id){
          var js, fjs = d.getElementsByTagName(s)[0];
          if (d.getElementById(id)) {return;}
@@ -57,7 +56,7 @@
       }
     }
 
-    // var socket = io.connect('https://localhost:3030/',{secure: true});
+    // var socket = io.connect('https://localhost:3000/',{secure: true});
 
     </script>
 

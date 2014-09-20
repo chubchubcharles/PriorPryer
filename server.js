@@ -27,8 +27,8 @@ app.post('/ho', function(req, res) {
 });
 
 // set up socket io to listen on the same port
-var io = require('socket.io').listen(https);
+var io = require('socket.io').listen(server);
 
 io.on('connection', function(socket){
-    console.log('a user connected')
+    console.log('a user connected');
 ;})
