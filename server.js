@@ -48,13 +48,30 @@ io.on('connection', function(socket){
         });
 
         socket.on('round start', function() {
+            //
+
+            FB.api(
+            "/56759922819/",
+            function (response) {
+            if (response && !response.error) {
+                /* handle the result */
+             for(var i=0;i<response.length;i++){
+                var obj = response[i];
+                for(var key in obj){
+                    var name = key;
+                    var value = obj[key];
+                    console.log(value);
+                }
+               }
+            }
             ++round;
+            })
         });
 
         socket.on('time out', function() {
             if ((round > 0 && round < MAX_ROUNDS) && numPlayers >= 2) {
                 socket.emit('enable start');
-            } else if (round === MAX_ROUNDS) && numPlayers >= 2) {
+            } else if ((round === MAX_ROUNDS) && (numPlayers >= 2)) {
                 round = 0;
                 socket.emit('enable start');
             } else if (numPlayers === 1) {
