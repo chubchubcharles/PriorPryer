@@ -19,6 +19,7 @@ var io = require('socket.io').listen(server);
 var fbnames = {};
 var scores = {};
 var numPlayers = 0;
+var round = 0;
 
 app.use(express.static(__dirname + '/client'));
 

@@ -2,6 +2,8 @@ $(function() {
     var socket = io();
     setName();
 var $window = $(window);
+    var seconds = 60;
+
   window.fbAsyncInit = function() {
     FB.init({
       appId      : '261908037266353', // App ID //Remember to hide this appID
@@ -120,11 +122,11 @@ var $window = $(window);
         }
         
         // click events
-        function displayTimer (seconds) {
+        function runTimer () {
             console.log('seconds: ' + seconds);
             if (seconds > 0) {
                 --seconds;
-                setTimeout("displayTimer(seconds)", 1000);
+                setTimeout(runTimer, 1000);
             }
         }
                  
@@ -132,8 +134,8 @@ var $window = $(window);
             // display a post
                                  
             // start the timer
-            var seconds = 60;
-            displayTimer(seconds);
+            seconds = 60;
+            runTimer();
             socket.emit('round start');
         }
         
@@ -150,7 +152,8 @@ var $window = $(window);
         });
 
         socket.on('find players', function () {
-            renderMFS();
+            //renderMFS();
+            console.log('find a player');
         });
 
         socket.on('enable start', function () {
