@@ -20,7 +20,7 @@ var fbnames = {};
 var scores = {};
 var numPlayers = 0;
 var round = 0;
-
+var MAX_ROUNDS = 5;
 app.use(express.static(__dirname + '/client'));
 
 io.on('connection', function(socket){
@@ -49,12 +49,24 @@ io.on('connection', function(socket){
         });
 
         socket.on('time out', function() {
-
+            if ((round > 0 && round < MAX_ROUNDS) && numPlayers >= 2) {
+                socket.emit('enable start');
+            } else if (round === MAX_ROUNDS) && numPlayers >= 2) {
+                round = 0;
+                socket.emit('enable start');
+            } else if (numPlayers === 1) {
+                round = 0;
+                socket.emit('find players', {
+                    name: name
+                });
+            }
         });
 
         socket.on('disconnect', function(socket) {
             --numPlayers;
             console.log('a user disconnected');
-            //socket.broadcast.emit('game over');
+            round = 0;
+            fbnames.splice(name, 0);
+            scores.splice(name, 0);
         });
 });

@@ -3,6 +3,7 @@ $(function() {
     setName();
     var $window = $(window);
     var seconds = 60;
+    var canPlay = false;
 
 window.fbAsyncInit = function() {
     FB.init({
@@ -153,20 +154,17 @@ window.fbAsyncInit = function() {
             seconds = 60;
             runTimer();
             socket.emit('round start');
+            canPlay = false;
         }
         
         //$startBttn.click (function () {
         $window.keydown (function () {
-            startRound();
+            if (canPlay) {
+                startRound();
+            }
                         
         });
                      
-        socket.on('game over', function () {
-            // render
-            console.log('game ended');
-            // socket events
-        });
-
         socket.on('find players', function () {
             //renderMFS();
             console.log('find a player');
@@ -175,6 +173,7 @@ window.fbAsyncInit = function() {
         socket.on('enable start', function () {
             // allow the begin button to be pressed
             console.log('start enabled');
+            canPlay = true;
         });
 
 });
