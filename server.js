@@ -21,26 +21,29 @@ var scores = {};
 var numPlayers = 0;
 var round = 0;
 var MAX_ROUNDS = 5;
+var MAX_PLAYERS = 4;
 app.use(express.static(__dirname + '/client'));
 
 io.on('connection', function(socket){
         console.log('a user connected');
 
         socket.on('add user', function (name) {
-            console.log('adding user');
-            socket.name = name;
-            fbnames[name] = name;
-            scores[name] = 0;
-            ++numPlayers;
+            if (numPlayers < MAX_PLAYERS) {
+                console.log('adding user');
+                socket.name = name;
+                fbnames.push(name);
+                scores.push(0);
+                ++numPlayers;
 
-            // get the list of mutual friends and posts
-            if (numPlayers === 1) {
-                console.log('first player');
-                socket.emit('find players', {
-                    name: name
-                }); 
-            } else if (numPlayers >= 2) {
-                socket.emit('enable start');
+                // get the list of mutual friends and posts
+                if (numPlayers === 1) {
+                    console.log('first player');
+                    socket.emit('find players', {
+                        name: name
+                    }); 
+                } else if (numPlayers >= 2) {
+                    socket.emit('enable start');
+                }
             }
         });
 
