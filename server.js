@@ -4,8 +4,8 @@ var https = require('https');
 var key = fs.readFileSync('./key.pem');
 var cert = fs.readFileSync('./cert.pem')
 var https_options = {
-    key: key,
-    cert: cert
+     key: key,
+     cert: cert
 };
 var path = require('path');
 var PORT = 8000;
@@ -23,23 +23,33 @@ var numPlayers = 0;
 app.use(express.static(__dirname + '/client'));
 
 io.on('connection', function(socket){
-    console.log('a user connected');
+        console.log('a user connected');
 
-    socket.on('add user', function (name) {
-        console.log('adding user');
-        socket.name = name;
-        fbnames[name] = name;
-        scores[name] = 0;
-        ++numPlayers;
+        socket.on('add user', function (name) {
+            console.log('adding user');
+            socket.name = name;
+            fbnames[name] = name;
+            scores[name] = 0;
+            ++numPlayers;
 
-        // get the list of mutual friends and posts
-        if (numPlayers === 1) {
-            console.log('first player');
-            socket.emit('find players', {
-                name: name
-            }); 
-        } else if (numPlayers >= 2) {
-            socket.emit('enable start');
-        }
-    });
+            // get the list of mutual friends and posts
+            if (numPlayers === 1) {
+                console.log('first player');
+                socket.emit('find players', {
+                    name: name
+                }); 
+            } else if (numPlayers >= 2) {
+                socket.emit('enable start');
+            }
+        });
+
+        socket.on('round start', function() {
+            ++round;
+        });
+
+        socket.on('disconnect', function(socket) {
+            --numPlayers;
+            console.log('a user disconnected');
+            //socket.broadcast.emit('game over');
+        });
 });

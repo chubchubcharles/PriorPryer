@@ -1,8 +1,7 @@
 $(function() {
     var socket = io();
     setName();
-    // var $window = $(window);
-
+var $window = $(window);
   window.fbAsyncInit = function() {
     FB.init({
       appId      : '261908037266353', // App ID //Remember to hide this appID
@@ -119,23 +118,37 @@ $(function() {
             var name = 'bob';
             socket.emit('add user', name);
         }
-/*
+        
         // click events
-        $joinButton.click(function () {
-            setName();
-        });
-*/
-        /* click on start (function () {
-            socket.emit("round start");            
-        });*/
-/*
-        $window.keydown(function (event) {
-            if (event.which === 13) {
-                setName();
+        function displayTimer (seconds) {
+            console.log('seconds: ' + seconds);
+            if (seconds > 0) {
+                --seconds;
+                setTimeout("displayTimer(seconds)", 1000);
             }
+        }
+                 
+        function startRound () {
+            // display a post
+                                 
+            // start the timer
+            var seconds = 60;
+            displayTimer(seconds);
+            socket.emit('round start');
+        }
+        
+        //$startBttn.click (function () {
+        $window.keydown (function () {
+            startRound();
+                        
         });
-*/
-        // socket events
+                     
+        socket.on('game over', function () {
+            // render
+            console.log('game ended');
+            // socket events
+        });
+
         socket.on('find players', function () {
             renderMFS();
         });
@@ -145,7 +158,4 @@ $(function() {
             console.log('start enabled');
         });
 
-        socket.on('start round', function () {
-
-        });
 });
