@@ -9,8 +9,9 @@ var https_options = {
 };
 var path = require('path');
 var PORT = 8000;
-//var HOST = 'localhost';
+var cors = require('cors');
 app = express();
+app.use(cors());
 var server = https.createServer(https_options, app).listen(PORT);
 console.log('HTTPS Server listening on port:%s', PORT);
 // set up socket io to listen on the same port
