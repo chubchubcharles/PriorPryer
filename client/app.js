@@ -127,6 +127,8 @@ var $window = $(window);
             if (seconds > 0) {
                 --seconds;
                 setTimeout(runTimer, 1000);
+            } else if (seconds === 0) {
+                socket.emit('time out');
             }
         }
                  

@@ -48,6 +48,10 @@ io.on('connection', function(socket){
             ++round;
         });
 
+        socket.on('time out', function() {
+
+        });
+
         socket.on('disconnect', function(socket) {
             --numPlayers;
             console.log('a user disconnected');
