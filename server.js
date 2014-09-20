@@ -9,10 +9,10 @@ var https_options = {
 };
 var path = require('path');
 var PORT = 8000;
-var HOST = 'localhost';
+//var HOST = 'localhost';
 app = express();
-var server = https.createServer(https_options, app).listen(PORT, HOST);
-console.log('HTTPS Server listening on %s:%s', HOST, PORT);
+var server = https.createServer(https_options, app).listen(PORT);
+console.log('HTTPS Server listening on port:%s', PORT);
 // set up socket io to listen on the same port
 var io = require('socket.io').listen(server);
 var fbnames = {};
@@ -34,7 +34,7 @@ io.on('connection', function(socket){
         // get the list of mutual friends and posts
         if (numPlayers === 1) {
             console.log('first player');
-            socket.emit('request players', {
+            socket.emit('find players', {
                 name: name
             }); 
         } else if (numPlayers >= 2) {

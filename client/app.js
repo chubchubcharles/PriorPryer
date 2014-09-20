@@ -85,4 +85,4 @@ $(function() {
         socket.on('start round', function () {
 
         });
-}
+});
