@@ -1,5 +1,6 @@
 $(function() {
         var socket = io();
+        setName();
         var $window = $(window);
 
         function sendRequest() {
@@ -66,12 +67,13 @@ $(function() {
         /* click on start (function () {
             socket.emit("round start");            
         });*/
+/*
         $window.keydown(function (event) {
             if (event.which === 13) {
                 setName();
             }
         });
-
+*/
         // socket events
         socket.on('find players', function () {
             renderMFS();
