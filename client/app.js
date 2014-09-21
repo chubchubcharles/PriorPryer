@@ -1,8 +1,8 @@
 $(function() {
     var socket = io();
-    setName();
     var $window = $(window);
     var seconds = 60;
+    var FADE_TIME = 150;
     var canPlay = false;
     var connected = false;
     var name;
@@ -11,12 +11,13 @@ $(function() {
     var $inputMessage = $('.inputMessage'); // Input message input box
     var $chatPage = $('.chat.page'); // The chatroom page
 
+    setName();
+
     $('.inputMessage').keypress(function(event) {
         if (event.which == '13') {
             event.preventDefault();
             $('.inputMessage').append('<div>' + $(this).val() + ' <span onclick="$(this).parent().remove();">X</span> </div>');
-            var value = $(this).val('');
-            alert(value.filter_input({regex:'[a-z]'}));
+            sendMessage();
         }
     });
 
@@ -164,7 +165,8 @@ window.fbAsyncInit = function() {
         function setName () {
             // get the fb name
             console.log('set name');
-            var name = 'bob';
+            name = 'bob';
+            connected = true;
             socket.emit('add user', name);
         }
         
@@ -267,17 +269,7 @@ window.fbAsyncInit = function() {
         function cleanInput (input) {
             return $('<div/>').text(input).text();
         }
-        
-        //$startBttn.click (function () {
-        $window.keydown (function (event) {
-            console.log('sending a message');
-            if (event.which === 13) {
-                sendMessage();
-            }
-            
-                        
-        });
-                     
+       
         socket.on('find players', function () {
             //renderMFS();
             console.log('find a player');
