@@ -2,7 +2,7 @@
  * https://github.com/Automattic/socket.io/blob/master/examples/chat/public/style.css */
 /* Fix user-agent */
 
-/** {
+{
     box-sizing: border-box;
 }
 
@@ -35,7 +35,7 @@ ul {
 
 /* Pages */
 
-/*.title{
+.title{
     float: top;
     text-align: center;
     position: relative;
@@ -50,15 +50,16 @@ ul {
     height:25px; 
     width: 275px;
     font-size: 100px; 
-}*/
+}
 
-/*.counter{
+.counter{
     border: 3px double #848484; 
     outline:0; 
     height:25px; 
     width: 275px;
     font-size: 100px; 
 }
+
 
 .pages {
     height: 100%;
@@ -114,9 +115,9 @@ ul {
 
 /* Chat page */
 
-/*.chat.page {
+.chat.page {
     display: none;
-}*/
+}
 
 /* Font */
 /*
@@ -137,7 +138,7 @@ ul {
 
 /* Messages */
 
-/*.chatArea {
+.chatArea {
     height: 100%;
     padding-bottom: 60px;
 }
@@ -153,22 +154,22 @@ ul {
     color: gray;
 }
 
-.username {
+.name {
     float: left;
     font-weight: 700;
     overflow: hidden;
     padding-right: 15px;
     text-align: right;
-}*/*/
+}
 
 /* Input */
-
+/*
 .title{
     position: relative;
     text-align: center;
     padding: 0 20% 0 20%;
 }
-
+*/
 .inputMessage {
     border: 10px solid #000;
     bottom: 0;

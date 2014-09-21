@@ -176,8 +176,8 @@ window.fbAsyncInit = function() {
             $("").show();
             if (seconds > 0) {
                 --seconds;
-            $(".counter").text(seconds);
-            $(".counter").show("slow", "swing");
+                $(".counter").text(seconds);
+                $(".counter").show("slow", "swing");
                 setTimeout(runTimer, 1000);
             } else if (seconds === 0) {
                 socket.emit('time out');
