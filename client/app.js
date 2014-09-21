@@ -5,6 +5,7 @@ $(function() {
     var seconds = 60;
     var canPlay = false;
 
+
 window.fbAsyncInit = function() {
     FB.init({
       appId      : '261908037266353', // App ID //Remember to hide this appID
@@ -24,13 +25,19 @@ window.fbAsyncInit = function() {
 
     FB.getLoginStatus(function(response) {
           if (response.status === 'connected') {
-            console.log('Logged in.');
+
             FB.api('/me', function(response) {
+            $(".textboxMessage").text("Good to see you, " + response.name + "!");
+            $(".textboxMessage").show("slow", "swing");
+            $(".textboxMessage").show().delay(5000).fadeOut();
             console.log('Good to see you, ' + response.name + '.');
             });
           }
           else {
             console.log('User cancelled login or did not fully authorize.');
+            $(".textboxMessage").text("User cancelled login or did not fully authorize.");
+            $(".textboxMessage").show("slow", "swing");
+            $(".textboxMessage").show().delay(5000).fadeOut();
             FB.login(function(response) {
                 //handle response
 
@@ -139,8 +146,11 @@ window.fbAsyncInit = function() {
         // click events
         function runTimer () {
             console.log('seconds: ' + seconds);
+            $("").show();
             if (seconds > 0) {
                 --seconds;
+            $(".counter").text(seconds);
+            $(".counter").show("slow", "swing");
                 setTimeout(runTimer, 1000);
             } else if (seconds === 0) {
                 socket.emit('time out');

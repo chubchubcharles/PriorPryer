@@ -26,6 +26,7 @@ app.use(express.static(__dirname + '/client'));
 
 io.on('connection', function(socket){
         console.log('a user connected');
+        socket.broadcast.emit('user connected');
 
         socket.on('add user', function (name) {
             if (numPlayers < MAX_PLAYERS) {
