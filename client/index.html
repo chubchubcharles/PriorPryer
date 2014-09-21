@@ -2,7 +2,11 @@
     <html>
         <head>
             <title>PriorPryer</title>
-            <link rel="stylesheet" href="style.css">
+            <link rel="stylesheet" type="text/css" href="style.css" >
+            <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+            <script src="/socket.io/socket.io.js"></script>
+            <script src="/app.js"></script>
+            <script src="//connect.facebook.net/en_US/all.js"></script>
         </head>
     <body>
     <ul class="pages">
@@ -10,21 +14,15 @@
     <div class="chatArea">
     <ul class="messages"></ul>
     </div>
-    <input class="inputMessage" placeholder="Type here..."/>
     </li>
     </ul>
     <div id="fb-root"></div>
 
-    <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="/app.js"></script>
-    <script src="//connect.facebook.net/en_US/all.js"></script>
-    <rel src="/client/stye.css"></rel>
-    <!-- Greet user -->
     <h1 class="title"> PriorPryer </h1>
+    <input type="text" class="inputMessage" placeholder="Type here..."/ >
     <h1 id="fb-welcome"></h1>
 
-    <div class="textboxMessage" style="display:none">
+    <div class="textboxMessage" style="display:none" >
       Default message
     </div>
     <br></br>

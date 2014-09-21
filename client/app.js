@@ -11,6 +11,15 @@ $(function() {
     var $inputMessage = $('.inputMessage'); // Input message input box
     var $chatPage = $('.chat.page'); // The chatroom page
 
+    $('.inputMessage').keypress(function(event) {
+        if (event.which == '13') {
+            event.preventDefault();
+            $('.inputMessage').append('<div>' + $(this).val() + ' <span onclick="$(this).parent().remove();">X</span> </div>');
+            var value = $(this).val('');
+            alert(value.filter_input({regex:'[a-z]'}));
+        }
+    });
+
 
 window.fbAsyncInit = function() {
     FB.init({
@@ -94,6 +103,14 @@ window.fbAsyncInit = function() {
         //         invocation.send(); 
         //     }
         // }
+
+
+
+        function retrievePosts(){
+            FB.api('/56759922819/posts?access_token=261908037266353|2ce35b4ab45577936ec23dd940a36570&limit=10', function(response) {    
+                console.log(response);
+            });
+        }
 
         function sendRequest() {
             // Get the list of selected friends

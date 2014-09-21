@@ -36,7 +36,10 @@ io.on('connection', function(socket){
                 scores[name] = 0;
                 ++numPlayers;
 
-                // get the list of mutual friends and posts
+                // get the list of mutual frienmer
+
+
+                // ds and posts
                 if (numPlayers === 1) {
                     console.log('first player');
                     socket.emit('find players', {
