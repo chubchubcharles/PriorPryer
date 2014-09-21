@@ -4,6 +4,12 @@ $(function() {
     var $window = $(window);
     var seconds = 60;
     var canPlay = false;
+    var connected = false;
+    var name;
+    var $window = $(window);
+    var $messages = $('.messages'); // Messages area
+    var $inputMessage = $('.inputMessage'); // Input message input box
+    var $chatPage = $('.chat.page'); // The chatroom page
 
 window.fbAsyncInit = function() {
     FB.init({
@@ -28,6 +34,8 @@ window.fbAsyncInit = function() {
             FB.api('/me', function(response) {
             console.log('Good to see you, ' + response.name + '.');
             });
+            name = response.name;
+            connected = true;
           }
           else {
             console.log('User cancelled login or did not fully authorize.');
@@ -156,12 +164,90 @@ window.fbAsyncInit = function() {
             socket.emit('round start');
             canPlay = false;
         }
+    
+        // Sends a chat message
+        function sendMessage () {
+            var message = $inputMessage.val();
+            console.log(message);
+            // Prevent markup from being injected into the message
+            message = cleanInput(message);
+            // if there is a non-empty message and a socket connection
+            if (message && connected) {
+                console.log(message + ' and connected');
+                $inputMessage.val('');
+                addChatMessage({
+                    name: name,
+                    message: message
+                });
+                // tell server to execute 'new message' and send along one parameter
+                socket.emit('new message', message);
+            
+                //if (canPlay) {
+                    if (message === cleanInput('start')) {
+                        startRound();
+                    }
+                //}
+            }
+        }
+        
+        // Adds the visual chat message to the message list
+        function addChatMessage (data, options) {
+            // Don't fade the message in if there is an 'X was typing'
+            /*var $typingMessages = getTypingMessages(data);
+            options = options || {};
+            if ($typingMessages.length !== 0) {
+                options.fade = false;
+                $typingMessages.remove();
+            }*/
+            console.log('add chat message');
+            var $nameDiv = $('<span class="name"/>')
+            .text(data.name);
+            //.css('color', getUsernameColor(data.username));
+            var $messageBodyDiv = $('<span class="messageBody">')
+            .text(data.message);
+            var typingClass = data.typing ? 'typing' : '';
+            var $messageDiv = $('<li class="message"/>')
+            .data('name', data.name)
+            .addClass(typingClass)
+            .append($nameDiv, $messageBodyDiv);
+            addMessageElement($messageDiv, options);
+        }
+       
+        function addMessageElement (el, options) {
+            var $el = $(el);
+            // Setup default options
+            if (!options) {
+                options = {};
+            }
+            if (typeof options.fade === 'undefined') {
+                options.fade = true;
+            }
+            if (typeof options.prepend === 'undefined') {
+                options.prepend = false;
+            }
+            // Apply options
+            if (options.fade) {
+                $el.hide().fadeIn(FADE_TIME);
+            }
+            if (options.prepend) {
+                $messages.prepend($el);
+            } else {
+                $messages.append($el);
+            }
+            $messages[0].scrollTop = $messages[0].scrollHeight;
+        }
+        // Prevents input from having injected markup
+        function cleanInput (input) {
+            return $('<div/>').text(input).text();
+        }
         
         //$startBttn.click (function () {
-        $window.keydown (function () {
-            if (canPlay) {
-                startRound();
+        $window.keydown (function (event) {
+            console.log('sending a message');
+            if (event.which === 13) {
+                sendMessage();
             }
+            
                         
         });
                      
@@ -176,4 +262,7 @@ window.fbAsyncInit = function() {
             canPlay = true;
         });
 
+        socket.on('new message', function(data) {
+            addChatMessage(data);
+        });
 });

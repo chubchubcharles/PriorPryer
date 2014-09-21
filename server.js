@@ -82,6 +82,15 @@ io.on('connection', function(socket){
             }
         });
 
+        // when the client emits 'new message', this listens and executes
+        socket.on('new message', function (data) {
+            // we tell the client to execute 'new message'
+            socket.broadcast.emit('new message', {
+                name: socket.name,
+                message: data
+            });
+        });
+
         socket.on('disconnect', function(socket) {
             --numPlayers;
             console.log('a user disconnected');
