@@ -46,7 +46,11 @@ io.on('connection', function(socket){
                         name: name
                     }); 
                 } else if (numPlayers >= 2) {
-                    socket.emit('enable start');
+                    socket.emit('enable start', {
+                        round: round,
+                        answer: answer,
+                        score: score[socket.name]
+                    });
                 }
             }
         });
@@ -74,10 +78,18 @@ io.on('connection', function(socket){
 
         socket.on('time out', function() {
             if ((round > 0 && round < MAX_ROUNDS) && numPlayers >= 2) {
-                socket.emit('enable start');
+                socket.emit('enable start', {
+                    round: round,
+                    name: socket.name,
+                    score: scores[socket.name]
+                });
             } else if ((round === MAX_ROUNDS) && (numPlayers >= 2)) {
                 round = 0;
-                socket.emit('enable start');
+                socket.emit('enable start', {
+                    round: round,
+                    name: socket.name,
+                    score: score[socket.name]
+                });
             } else if (numPlayers === 1) {
                 round = 0;
                 socket.emit('find players', {

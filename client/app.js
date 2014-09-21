@@ -5,11 +5,16 @@ $(function() {
     var FADE_TIME = 150;
     var canPlay = false;
     var connected = false;
+    var playing = false;
+    var score = 100;
     var name;
+    var answer;
     var $window = $(window);
     var $messages = $('.messages'); // Messages area
     var $inputMessage = $('.inputMessage'); // Input message input box
     var $chatPage = $('.chat.page'); // The chatroom page
+    var round;
+    var personal_score;
 
     setName();
 
@@ -178,9 +183,18 @@ window.fbAsyncInit = function() {
                 --seconds;
                 $(".counter").text(seconds);
                 $(".counter").show("slow", "swing");
+                if (seconds <= 5) {
+                    score = 25;
+                } else if (seconds <= 15) {
+                    score = 50
+                } else if (seconds <= 30) {  
+                    score = 75;
+                }
                 setTimeout(runTimer, 1000);
             } else if (seconds === 0) {
-                socket.emit('time out');
+                socket.emit('time out', {
+                    score: personal_score
+                });
             }
         }
                  
@@ -192,6 +206,7 @@ window.fbAsyncInit = function() {
             runTimer();
             socket.emit('round start');
             canPlay = false;
+            playing = true;
         }
     
         // Sends a chat message
@@ -211,11 +226,15 @@ window.fbAsyncInit = function() {
                 // tell server to execute 'new message' and send along one parameter
                 socket.emit('new message', message);
             
-                //if (canPlay) {
-                    if (message === cleanInput('start')) {
+                if (canPlay) {
+                    if (message.toUpperCase() === cleanInput('start').toUpperCase) {
                         startRound();
                     }
-                //}
+                } else if (playing) {
+                    if (message === cleanInput(answer)) {
+                        personal_score += score; 
+                    }
+                }
             }
         }
         
@@ -275,10 +294,13 @@ window.fbAsyncInit = function() {
             console.log('find a player');
         });
 
-        socket.on('enable start', function () {
+        socket.on('enable start', function (data) {
             // allow the begin button to be pressed
             console.log('start enabled');
             canPlay = true;
+            answer = data.answer;
+            round = data.round;
+            personal_score = data.score;
         });
 
         socket.on('new message', function(data) {
