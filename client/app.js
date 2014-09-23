@@ -227,7 +227,7 @@ window.fbAsyncInit = function() {
                 socket.emit('new message', message);
             
                 if (canPlay) {
-                    if (message.toUpperCase() === cleanInput('start').toUpperCase) {
+                    if (message === cleanInput('start')) {
                         startRound();
                     }
                 } else if (playing) {
