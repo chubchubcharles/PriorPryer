@@ -1,8 +1,26 @@
 {
-    "name": "PriorPryer",
-        "description": "Facebook game app",
-        "version": "0.0.1",
-        "dependencies": {
-            "express": "4.9.3"
-        }
+  "name": "PriorPryer",
+  "version": "1.0.0",
+  "description": "PriorPryer ==========",
+  "main": "server.js",
+  "dependencies": {
+    "cors": "^2.4.2",
+    "socket.io": "^1.1.0",
+    "express": "^4.9.3"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/chubchubcharles/PriorPryer"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/chubchubcharles/PriorPryer/issues"
+  },
+  "homepage": "https://github.com/chubchubcharles/PriorPryer"
 }
