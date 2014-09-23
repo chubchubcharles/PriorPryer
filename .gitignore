@@ -1,5 +1,8 @@
 npm-debug.log
 *.save
 *.swp
+<<<<<<< HEAD
 node_modules
+=======
+>>>>>>> 5676a8f778cf231020f71c01943658874e4105e4
 *.pem
