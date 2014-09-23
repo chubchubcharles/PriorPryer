@@ -1,3 +1,5 @@
 npm-debug.log
 *.save
 *.swp
+node_modules
+*.pem
