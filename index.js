@@ -9,44 +9,25 @@ var path = require('path')
 var app = express();
 
 // Import the PriorPryer game file.
-// var ppr = require('./priorpryer');
+var ppr = require('./pprgame');
 
 // Create a simple Express application
 
   // Serve static html, js, css and image files from the 'path'
   app.use(express.static(path.join(__dirname,'public')));
 
-
-var http = require('http').Server(app);
-var io = require('socket.io')(http);
-// io = server, client = client
-
-// io server instance listens for "connection" event and then console.logs
-io.sockets.on('connection', function(client){
-  var answer;
-	// broadcast.emit will send to all except socket sender  
-	client.broadcast.emit('user connected');
-  client.on('chat message', function(msg){
-    // console.log("Message:" + msg);
-    // console.log("Answer:" + answer);
-  	// server upon receiving "chat message" event, also fires an event with the same name with the msg
-    io.emit('chat message', msg); 
-    if (msg === answer){
-      io.emit('correct answer');
-    }
-  });
-  client.on('new question', function(msg){
-    // console.log("New Question, Answer is " + msg);
-    answer = msg;
-  });
-  client.on('disconnect', function(msg){
-    io.emit('disconnect', "user disconnected");
-  });
-});
-
-
-http.listen(3000, function(){
+// Create a Node.js based http server on port 3000
+var server = require('http').createServer(app).listen(3000, function(){
   console.log('listening on *:3000');
 });
+
+// Create a Socket.IO server and attach it to the http server
+var io = require('socket.io').listen(server);
+
+// Listens for Socket.IO Connections. Once connected, game logic.
+io.sockets.on('connection', function (socket){
+  ppr.initGame(io, socket);
+});
+
 
 
