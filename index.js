@@ -19,6 +19,7 @@ var ppr = require('./pprgame');
 // Create a Node.js based http server on port 3000
 var server = require('http').createServer(app).listen(3000, function(){
   console.log('listening on *:3000');
+  console.log(process.env.APP_ID)
 });
 
 // Create a Socket.IO server and attach it to the http server
