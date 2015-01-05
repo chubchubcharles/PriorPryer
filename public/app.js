@@ -12,12 +12,45 @@ jQuery(function($){
 
 		bindEvents : function() {
 			IO.socket.on('connected', IO.onConnected );
+			IO.socket.on('successfulLogin', IO.onSuccessfulLogin);
+			IO.socket.on('newGameCreated', IO.onNewGameCreated);
+			IO.socket.on('retrievedRooms', IO.onRetrievedRooms);
+      IO.socket.on('playerJoinedRoom', IO.playerJoinedRoom );
 		},
 
 		onConnected : function() {
 			var socketID = IO.socket.io.engine.id;
 			console.log("This is the client ID: " + socketID);
 			App.mySocketId = socketID;
+		},
+
+		onSuccessfulLogin : function(data) {
+			console.log("onSuccessfulLogin and now viewing available rooms");
+			App.Host.findRooms();
+			//IO.socket.emit('retrieveRooms');
+		},
+
+		onNewGameCreated : function(data) {
+			//data includes: gameId, mySocketID
+			console.log("Creating new game");
+			App.Host.gameInit(data);
+		},
+
+		onRetrievedRooms: function(data){
+			App.Host.showRooms(data);
+    },
+    /**
+		 * A player has successfully joined the game.
+		 * @param data {{playerName: string, gameId: int, mySocketId: int}}
+		 */
+		playerJoinedRoom : function(data) {
+		    // When a player joins a room, do the updateWaitingScreen funciton.
+		    // There are two versions of this function: one for the 'host' and
+		    // another for the 'player'.
+		    //
+		    // So on the 'host' browser window, the App.Host.updateWiatingScreen function is called.
+		    // And on the player's browser, App.Player.updateWaitingScreen is called.
+		    App.Player.updateWaitingScreen(data);
 		}
 
 	};
@@ -53,7 +86,8 @@ jQuery(function($){
 	    // These templates on index.html are stored into jQuery variables
 	    App.$gameArea = $('#gameArea'); //#gameArea is id element on html page
 	    App.$templateIntroScreen = $('#intro-screen-template').html();
-	    // App.$templateNewGame = $('#create-game-template').html();
+	    App.$templateStartGame = $('#start-game-template').html();
+	    App.$templateGame = $('#game-template').html();
 	    // App.$templateJoinGame = $('#join-game-template').html();
 	    // App.$hostGame = $('#host-game-template').html();
 		},
@@ -63,6 +97,7 @@ jQuery(function($){
      */
     bindEvents: function () {
         // Host
+        App.$doc.on('click', '#btnStartGame', App.Host.onStartClick);
         App.$doc.on('click', '#btnCreateGame', App.Host.onCreateClick);
 
         // Player
@@ -83,9 +118,198 @@ jQuery(function($){
     showInitScreen: function() {
         App.$gameArea.html(App.$templateIntroScreen); //gameArea html filled by another template's html
         // App.doTextFit('.title');
-    }
+    },
 
-    
+    Host: {
+
+    //Host variables:
+    	//players: []
+    	//isNewGame : false
+    	//numPlayersInRoom : 0
+    	//currentCorrectAnswer: ''
+    onStartClick: function () {
+        console.log("CLICKED \"START\": Facebook LOGIN should be prompted here");
+        //TODO: Facebook Login Prompt
+
+        IO.socket.emit('startGameAndLogin');
+    },
+
+    onCreateClick: function () {
+        // console.log('Clicked "Create A Game"');
+        console.log("CLICKED \"CREATE\"");
+        IO.socket.emit('hostCreateNewGame');
+    },
+
+    numPlayersInRoom: 0,
+    rooms: 0,
+
+		findRooms: function() {
+    	// We first neet to retrieve from server to find rooms
+    	IO.socket.emit('retrieveRooms');
+    },
+
+    showRooms: function(data) {
+    	App.$gameArea.html(App.$templateStartGame);
+    	//Have to filter these rooms
+    	// print with JSON.stringify(data.rooms, null, 4)
+    	var actualRooms = [];
+    	// var numberedID = /[1-9][1-9][1-9][1-9]/;
+
+			$('#currentRooms').text("Current Rooms: " + actualRooms);
+
+			for (var key in data.rooms){
+				console.log(key);
+				if (key.length == 5 || key.length == 4){
+					// NEED TO FIX TO IDENTIFY GAME ROOMS
+					actualRooms.push(key);
+					var $roomButton = $('<button id="btnJoinGame" class="btn rooms">' + key +'</button>')
+					$roomButton.appendTo($("#roomButtons"));
+					// hopefully buttons have listeners
+
+					// downstream events should be carefully considered
+					App.$doc.on('click', '#btnJoinGame', App.Player.onPlayerStartClick(key));
+					// ...
+					// app.js emits event that sends data
+					// pprgame.js receives data and in the method calls .join()
+					// pprgame.js emits event to app.js
+					// app.js changes its template based on gameID data
+					// problem is button wiring to specific game room
+				}
+			}
+
+    	// var rooms = filterRooms(data);
+			console.log("Rooms " + actualRooms);
+    },
+
+    gameInit: function(data) {
+    	App.gameId = data.gameId;
+    	App.mySocketId = data.mySocketId;
+    	App.rooms = data.rooms;
+    	//initialize App or game settings
+    	App.Host.numPlayersInRoom = 0;
+    	App.Host.displayNewGameScreen();
+    	console.log("Game started with ID: " + App.gameId + ' by host: ' + App.mySocketId);
+    },
+
+    displayNewGameScreen: function() {
+      // Fill the game screen with the appropriate HTML
+      App.$gameArea.html(App.$templateGame);	
+
+      // Display the URL on screen
+      $('#gameURL').text(window.location.href);
+      // App.doTextFit('#gameURL');
+
+      // Show the gameId / room id on screen
+      $('#spanNewGameCode').text("You are in game: " + App.gameId);
+    },
+
+    filterRooms: function(rooms){
+    	var actualRooms = [];
+    	var numberedID = /[1-9][1-9][1-9][1-9]/;
+    	for (var key in rooms){
+    		var obj = rooms[key];
+    		if (numberedID.test(obj)){
+    			console.log("OBJ" + obj);
+    			actualRooms.push(obj);
+    		}
+    	}
+    }
+  },
+
+
+
+  	//THIS FUNCTION IS NOT BEING CALLED ATM
+    /**
+   * Update the Host screen when the first player joins
+   * @param data{{playerName: string}}
+   */
+  updateWaitingScreen: function(data) {
+      // If this is a restarted game, show the screen.
+      if ( App.Host.isNewGame ) {
+          App.Host.displayNewGameScreen();
+      }
+      // Update host screen
+      $('#playersWaiting')
+          .append('<p/>')
+          .text('Player ' + data.playerName + ' joined the game.');
+
+      // Store the new player's data on the Host.
+      App.Host.players.push(data);
+
+      // Increment the number of players in the room
+      App.Host.numPlayersInRoom += 1;
+
+      // If two players have joined, start the game!
+      if (App.Host.numPlayersInRoom === 2) {
+          // console.log('Room is full. Almost ready!');
+
+          // Let the server know that two players are present.
+          IO.socket.emit('hostRoomFull',App.gameId);
+          console.log("hostRoomFull! Begin Game!!!");
+      }
+  },
+
+  /* *****************************
+   *        PLAYER CODE        *
+   ***************************** */
+
+		Player : {
+    /**
+     * A reference to the socket ID of the Host
+     */
+    hostSocketId: '',
+
+
+    /**
+     * The player's name entered on the 'Join' screen.
+     */
+    myName: '',
+
+    // /**
+    //  * Click handler for the 'JOIN' button
+    //  */
+    // onJoinClick: function () {
+    //     // console.log('Clicked "Join A Game"');
+
+    //     // Display the Join Game HTML on the player's screen.
+    //     App.$gameArea.html(App.$templateGame);
+    // },
+
+
+    onPlayerStartClick: function(gameId) {
+	    // console.log('Player clicked "Start"');
+	    // collect data to send to the server
+	    var data = {
+	        gameId : +(gameId),
+	        playerName : App.mySocketId
+	    };
+
+	    // Send the gameId and playerName to the server
+	    IO.socket.emit('playerJoinGame', data);
+
+	    // Set the appropriate properties for the current player.
+	    App.myRole = 'Player';
+	    App.Player.myName = data.playerName;
+		},
+
+    /**
+		 * Display the waiting screen for player 1
+		 * @param data
+		 */
+		updateWaitingScreen : function(data) {
+		    if(App.mySocketId === data.mySocketId){
+		        App.myRole = 'Player';
+		        App.gameId = data.gameId;
+
+		        $('#playerWaitingMessage')
+		            .append('<p/>')
+		            .text('Joined Game ' + data.gameId + '. Please wait for game to begin.');
+		    }	
+		   console.log("after bug");
+
+}
+
+    }
 	};
 
 

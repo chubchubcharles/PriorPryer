@@ -41,9 +41,34 @@ text/template">
     <div class="title"> PriorPryer </div>
 
     <div class="buttons">
-      <button id="btnCreateGame"
-      class="btn create">CREATE</button>
+      <button id="btnStartGame"
+      class="btn start">START</button>
     </div>
+  </div>
+</script>
+
+<script id="start-game-template" type="text/template">
+    <div class="startGameWrapper">
+
+        <div class="info">This is where the rooms can be found</div>
+        <div id="currentRooms" class="info">Error!</div>
+
+        <div class="buttons">
+          <div id="roomButtons"></div>     
+          <button id="btnCreateGame"
+          class="btn create">CREATE</button>
+        </div>
+    </div>
+</script>
+
+
+<script id= "game-template" type="text/template">
+  <div class="gameWrapper"> 
+    <div class="info">This is where the game should be played!
+    <div id="spanNewGameCode" class="gameId" class="info">Error!</div></div>
+    <div id="gameURL" class="info">Error!</div>  
+    <div id="playersWaiting"></div>
+    <div id="playerWaitingMessage"></div>
   </div>
 </script>
 

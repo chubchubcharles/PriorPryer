@@ -83,20 +83,58 @@ html, body{
     text-align: center;
 }
 
-.createGameWrapper{
+.startGameWrapper, .gameWrapper{
     font-family: 'Quicksand', sans-serif;
     margin: 0 auto;
     text-align: center;
 }
 
-.createGameWrapper .info{
+.startGameWrapper .info{
     color: #ECFFE0;
     font-weight: 400;
     font-size: 2em;
     margin-top: 1.5em;
 }
 
-.createGameWrapper{
+.startGameWrapper{
+    color: #AE37B2;
+    font-weight: 300;
+}
+
+.info label {
+    display: block;
+}
+
+.info input {
+    text-align: center;
+    padding: 10px;
+    width: 200px;
+    height: 60px;
+    font-family: 'Quicksand', sans-serif;
+    color: #A22FB0;
+    font-weight: 300;
+    font-size: 54px;
+    border: 1px dotted white;
+    border-radius: 10px;
+    background: transparent;
+}
+
+.info input#inputPlayerName {
+    width: 90%;
+}
+
+/* ******************************
+          PLAYER GAME SCREEN
+
+   ****************************** */
+.gameWrapper .info{
+    color: #ECFFE0;
+    font-weight: 400;
+    font-size: 2em;
+    margin-top: 1.5em;
+}
+
+.gameWrapper{
     color: #AE37B2;
     font-weight: 300;
 }
