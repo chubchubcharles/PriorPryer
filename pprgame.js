@@ -8,11 +8,16 @@ var gameSocket;
 exports.initGame = function(sio, socket){
 	io = sio;
 	gameSocket = socket;
-	gameSocket.emit('connected', { message: "You are connected!" });
+  gameSocket.emit('connected', { message: "You are connected!" });
+
+  //Host events
   gameSocket.on('startGameAndLogin', startGameAndLogin);
   gameSocket.on('retrieveRooms', retrieveRooms)
 	gameSocket.on('hostCreateNewGame', hostCreateNewGame);
   gameSocket.on('playerJoinGame', playerJoinGame);
+  gameSocket.on('hostRoomFull', hostPrepareGame);
+
+  //Player Events
 
 }
 
@@ -52,6 +57,21 @@ function hostCreateNewGame() {
     this.join(thisGameId.toString());
 };
 
+/*
+ * Two players have joined. Alert the host!
+ * @param gameId The game ID / room ID
+ */
+function hostPrepareGame(gameId) {
+    var sock = this;
+    var data = {
+        mySocketId : sock.id,
+        gameId : gameId
+    };
+    console.log("All Players Present. Preparing game...");
+    io.sockets.in(data.gameId).emit('beginNewGame', data);
+}
+
+
 /**
  * A player clicked the 'START GAME' button.
  * Attempt to connect them to the room that matches
@@ -59,7 +79,7 @@ function hostCreateNewGame() {
  * @param data Contains data entered via player's input - playerName and gameId.
  */
 function playerJoinGame(data) {
-    console.log('Player ' + data.playerName + ' attempting to join game: ' + data.gameId );
+    console.log('Player ' + data.playerName + ' attempting to join game: ' + data.gameId);
 
     // A reference to the player's Socket.IO socket object
     var sock = this;

@@ -16,10 +16,10 @@
   the FB.login() function when clicked.
 -->
 
-<!-- <fb:login-button scope="public_profile,email" onlogin="checkLoginState();">
+<fb:login-button scope="public_profile,email" onlogin="checkLoginState();">
 </fb:login-button>
 
-<div id="status"></div>
+<!-- <div id="status"></div>
 <div id="button"> </div>
 
 <div id="start"></div>
@@ -58,6 +58,7 @@ text/template">
           <button id="btnCreateGame"
           class="btn create">CREATE</button>
         </div>
+        <div id="playerWaitingMessage" class="info"></div>
     </div>
 </script>
 
@@ -67,9 +68,24 @@ text/template">
     <div class="info">This is where the game should be played!
     <div id="spanNewGameCode" class="gameId" class="info">Error!</div></div>
     <div id="gameURL" class="info">Error!</div>  
-    <div id="playersWaiting"></div>
+    <div id="playersWaiting" class="info"></div>
     <div id="playerWaitingMessage"></div>
   </div>
+</script>
+
+    <!-- This is the 'Host' screen. It displays the word for each player to match -->
+<script id="host-game-template" type="text/template">
+    <div id="wordArea">
+        <div id="hostWord">5</div>
+    </div>
+    <div id="playerScores">
+        <div id="player1Score" class="playerScore">
+            <span class="score">0</span><span class="playerName">Player 1</span>
+        </div>
+        <div id="player2Score" class="playerScore">
+            <span class="playerName">Player 2</span><span class="score">0</span>
+        </div>
+    </div>
 </script>
 
 
@@ -112,6 +128,17 @@ text/template">
 
 
 // </script>
+
+<!-- JavaScript Libraries -->
+
+<!-- TextFit resizes text to fill a container.
+    It's used so the titles and game words fit properly on any size screen.
+    https://github.com/STRML/textFit   -->
+<script src="libs/textFit.min.js"></script>
+
+<!-- FastClick is used to eliminate the 300ms delay when clicking items on a mobile device
+    https://github.com/ftlabs/fastclick -->
+<script src="libs/fastclick.js"></script>
 
 <!-- If Socket.IO is used with Express, then the /socket.io/ path will
     serve the proper Socket.IO javascript files used by the browser -->
