@@ -4,7 +4,8 @@
 <title> PriorPryer - Facebook Game</title>
 <meta charset="UTF-8">
 <!-- JQUERY loaded externally -->
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<!-- <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script> -->
+<script src="http://code.jquery.com/jquery-1.11.1.js"></script>
 
 <link href="css/styles.css" rel="stylesheet">
 </head>
@@ -73,20 +74,25 @@ text/template">
   </div>
 </script>
 
-    <!-- This is the 'Host' screen. It displays the word for each player to match -->
+  <!-- This is the 'Host' screen. It displays the word for each player to match -->
 <script id="host-game-template" type="text/template">
     <div id="wordArea">
         <div id="hostWord">5</div>
     </div>
-    <div id="playerScores">
-        <div id="player1Score" class="playerScore">
-            <span class="score">0</span><span class="playerName">Player 1</span>
-        </div>
-        <div id="player2Score" class="playerScore">
-            <span class="playerName">Player 2</span><span class="score">0</span>
-        </div>
+    // <ul id="messages"></ul>
+    // <form action="">
+    //   <input id="m" autocomplete="off" /><button id="sendButton">Send</button>
+    // </form>
     </div>
-</script>
+    <div id="playerScores">
+        <div id="player1Score" class="playerScore" class="info">
+            <span class="playerName">Player 1</span> <span class="score">0</span>
+        </div>
+        <div id="player2Score" class="playerScore" class="info">
+            <span class="playerName">Player 2</span> <span class="score">0</span>
+        </div>
+    </div
+></script>
 
 
 <!-- SOCKET.IO SECTION -->
@@ -142,7 +148,8 @@ text/template">
 
 <!-- If Socket.IO is used with Express, then the /socket.io/ path will
     serve the proper Socket.IO javascript files used by the browser -->
-<script src="/socket.io/socket.io.js"></script>
+<!-- <script src="/socket.io/socket.io.js"></script> -->
+<script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
 
 <!-- app.js where all the client-side
  PriorPryer game logic -->

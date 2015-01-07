@@ -19,6 +19,7 @@ var ppr = require('./pprgame');
 // Create a Node.js based http server on port 3000
 var server = require('http').createServer(app).listen(3000, function(){
   console.log('listening on *:3000');
+  // Facebook API environment variable
   console.log(process.env.APP_ID)
 });
 
