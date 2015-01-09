@@ -18,6 +18,7 @@ exports.initGame = function(sio, socket){
   gameSocket.on('hostRoomFull', hostPrepareGame);
   gameSocket.on('hostCountdownFinished', hostStartGame);
   gameSocket.on('chat message', playerMessage);
+  gameSocket.on('hostNextRound', hostNextRound);
 
   //Player Events
 
@@ -85,6 +86,21 @@ function hostStartGame(gameId) {
     sendWord(0,gameId);
 };
 
+/**
+ * A player answered correctly. Time for the next word.
+ * @param data Sent from the client. Contains the current round and gameId (room)
+ */
+function hostNextRound(data) {
+    if(data.round < wordPool.length ){
+        // Send a new set of words back to the host and players.
+        sendWord(data.round, data.gameId);
+    } else {
+        // If the current round exceeds the number of words, send the 'gameOver' event.
+        console.log("Game over in server.");
+        io.sockets.in(data.gameId).emit('gameOver',data);
+    }
+};
+
 
 /**
  * A player clicked the 'START GAME' button.
@@ -137,6 +153,7 @@ function sendWord(wordPoolIndex, gameId) {
   // TODO: Put facebook posts in this data array
     var data = getWordData(wordPoolIndex);
     console.log("sendWord to gameId: " + gameId);
+        console.log("Current correct answer: " + data.answer);
   // Each round we submit data that includes round, question post, answer
     io.sockets.in(gameId).emit('newWordData', data);
 }
@@ -264,7 +281,9 @@ function playerMessage(data) {
   // console.log("Answer:" + answer);
   // server upon receiving "chat message" event, also fires an event with the same name with the msg
   console.log("Someone said something!");
-  io.sockets.in(gameId).emit('chat message', data);
+  io.sockets.in(data.gameId).emit('chat message', data);
+  console.log("Data right now in server: " + data.authorId + " and message: " + data.message);
+  io.sockets.in(data.gameId).emit('hostCheckAnswer', data);
   // if (msg === answer){
   //   io.emit('correct answer');
   // }

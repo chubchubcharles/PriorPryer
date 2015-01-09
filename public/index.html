@@ -76,23 +76,26 @@ text/template">
 
   <!-- This is the 'Host' screen. It displays the word for each player to match -->
 <script id="host-game-template" type="text/template">
+    <div id="playerScores">
+      <div id="player1Score" class="playerScore" class="info">
+          <span class="playerName">Player 1</span> <span class="score">0</span>
+      </div>
+      <div id="player2Score" class="playerScore" class="info">
+          <span class="score">0</span> <span class="playerName">Player 2</span> 
+      </div>
+    </div>
     <div id="wordArea">
         <div id="hostWord">5</div>
     </div>
-    // <ul id="messages"></ul>
-    // <form action="">
-    //   <input id="m" autocomplete="off" /><button id="sendButton">Send</button>
-    // </form>
+    <div id="chatArea">
+      <ul id="messages"></ul>
+      <form action="" id="typeArea">
+        <input id="m" autocomplete="off" /><button id="sendButton">Send</button>
+      </form>
     </div>
-    <div id="playerScores">
-        <div id="player1Score" class="playerScore" class="info">
-            <span class="playerName">Player 1</span> <span class="score">0</span>
-        </div>
-        <div id="player2Score" class="playerScore" class="info">
-            <span class="playerName">Player 2</span> <span class="score">0</span>
-        </div>
-    </div
-></script>
+    </script>
+
+
 
 
 <!-- SOCKET.IO SECTION -->
