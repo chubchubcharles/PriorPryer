@@ -64,7 +64,8 @@ jQuery(function($){
      * @param data
      */
     beginNewGame : function(data) {
-        App[App.myRole].gameCountdown(data);
+
+      App[App.myRole].gameCountdown(data);
     },
 
     /**
@@ -240,37 +241,92 @@ jQuery(function($){
     onStartClick: function () {
         // console.log("CLICKED \"START\": Facebook LOGIN should be prompted here");
         //TODO: Facebook Login Prompt
-
-    var statusChangeCallback = function(response) {
-      console.log('statusChangeCallback');
-      console.log(response);
-      // The response object is returned with a status field that lets the
-      // app know the current login status of the person.
-      // Full docs on the response object can be found in the documentation
-      // for FB.getLoginStatus().
-      if (response.status === 'connected') {
-        // Logged into your app and Facebook.
-        IO.socket.emit('startGameAndLogin');
-      } else if (response.status === 'not_authorized') {
-        // The person is logged into Facebook, but not your app.
-        document.getElementById('status').innerHTML = 'Please log ' +
-          'into this app.';
-      } else {
-        // The person is not logged into Facebook, so we're not sure if
-        // they are logged into this app or not.
-	console.log('not logged in');
-        FB.login(function(response) {
-          statusChangeCallback(response);
-        }, {scope: 'public_profile,email'});
-      }
-    };
-
-        FB.getLoginStatus(function(response) {
-	    console.log('got the status');
+      var statusChangeCallback = function(response) {
+        console.log('statusChangeCallback');
+        console.log(response);
+        // The response object is returned with a status field that lets the
+        // app know the current login status of the person.
+        // Full docs on the response object can be found in the documentation
+        // for FB.getLoginStatus().
+        if (response.status === 'connected') {
+          // Logged into your app and Facebook.
+          var dataCollect = function(){
+           FB.api('/me/home?fields=type,message,from,to', function(responses) {
+            console.log(responses);
+            // var posts = []
+            var filterResponses = function(responses){
+              // filters responses from api request and selects only one response
+              var responseArray = responses.data;
+              var filteredArray = [];
+              var index;
+              for ( index = 0 ; index < responseArray.length ; ++index){
+                console.log((responseArray[index].type));
+                if (responseArray[index].type === "status" && responseArray[index].message && responseArray[index].to){
+                  console.log("Yes, status found");
+                  filteredArray.push(responseArray[index]);
+                }
+              }
+              return filteredArray;
+            }
+            var posts = filterResponses(responses);
+            // var post_url = JSON.stringify(formatResponse(response));
+            // var post_url = post_url.replace(/\"/g, "")
+            if (posts.length !== 0 ){
+              // $(document).ready(function(){
+              var ToPeople = function (ToArray){
+                // assumes data array
+                var index;
+                var people = "";
+                for (index = 0; index < ToArray.length ; ++index){
+                  if (people === ""){
+                      people += JSONObjToString(ToArray[index].name);
+                  }
+                  else{
+                    people += ", " + JSONObjToString(ToArray[index].name);
+                  }
+                }
+                return people;
+              };
+              var JSONObjToString = function(obj){
+                var fin = JSON.stringify(obj);
+                fin = fin.replace(/\"/g, "")
+                return fin;
+              }; 
+              var index;
+              for (index = 0 ; index < posts.length ; ++index){
+                console.log("Type: " + posts[index].type + "\n" + "Message: " + posts[index].message + "  From: " + JSONObjToString(posts[index].from.name) + " To: " + ToPeople(posts[index].to.data));
+              }
+                // var gameFinish = false;
+                // var round = 0;
+                // var numRounds = 1;
+                // while (round < numRounds || gameFinish !== "true"){
+                  // newRound(posts, round);
+                  // round++;
+            }
+              });
+            };
+          dataCollect();
+          IO.socket.emit('startGameAndLogin');
+        } else if (response.status === 'not_authorized') {
+          // The person is logged into Facebook, but not your app.
+          document.getElementById('status').innerHTML = 'Please log ' +
+            'into this app.';
+        } else {
+          // The person is not logged into Facebook, so we're not sure if
+          // they are logged into this app or not.
+  	      console.log('not logged in');
+          FB.login(function(response) {
             statusChangeCallback(response);
-        });
-        //IO.socket.emit('startGameAndLogin');
-    },
+          }, {scope: 'public_profile,email'});
+        }
+      };
+
+          FB.getLoginStatus(function(response) {
+  	    console.log('got the status');
+              statusChangeCallback(response);
+          });
+          //IO.socket.emit('startGameAndLogin');
+      },
 
     onCreateClick: function () {
         // console.log('Clicked "Create A Game"');
@@ -996,20 +1052,20 @@ jQuery(function($){
 //     return;
 //   }
 
-//   function filterResponses(responses){
-//     // filters responses from api request and selects only one response
-//     var responseArray = responses.data;
-//     var filteredArray = [];
-//     var index;
-//     for ( index = 0 ; index < responseArray.length ; ++index){
-//       console.log((responseArray[index].type));
-//       if (responseArray[index].type === "status" && responseArray[index].message && responseArray[index].to){
-//         console.log("Yes, status found");
-//         filteredArray.push(responseArray[index]);
-//       }
-//     }
-//     return filteredArray;
-//   }
+  // function filterResponses(responses){
+  //   // filters responses from api request and selects only one response
+  //   var responseArray = responses.data;
+  //   var filteredArray = [];
+  //   var index;
+  //   for ( index = 0 ; index < responseArray.length ; ++index){
+  //     console.log((responseArray[index].type));
+  //     if (responseArray[index].type === "status" && responseArray[index].message && responseArray[index].to){
+  //       console.log("Yes, status found");
+  //       filteredArray.push(responseArray[index]);
+  //     }
+  //   }
+  //   return filteredArray;
+  // }
 
 //   function formatResponse(response){
 //     // converts response into url
