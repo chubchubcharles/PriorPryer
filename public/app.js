@@ -30,7 +30,7 @@ jQuery(function($){
 			App.mySocketId = socketID;
 		},
 
-		onSuccessfulLogin : function(data) {
+		onSuccessfulLogin : function() {
 			// console.log("onSuccessfulLogin and now viewing available rooms");
 			App.Host.findRooms();
 			//IO.socket.emit('retrieveRooms');
@@ -55,8 +55,75 @@ jQuery(function($){
 		    // another for the 'player'.
 		    //
 		    // So on the 'host' browser window, the App.Host.updateWiatingScreen function is called.
-		    // And on the player's browser, App.Player.updateWaitingScreen is called.
-		    App[App.myRole].updateWaitingScreen(data);
+		    // And on the player's browser, App.Player.updateWaitingScreen is called.\\
+        // This is where fb request should be called on both HOST and PLAYER
+        console.log("FB REQUEST!");
+        //Fb request on both sides
+        var posts = 
+            FB.api('/me/home?fields=type,message,from,to', function(responses) {
+              // console.log(responses);
+              var filterResponses = function(responses){
+                // filters responses from api request and selects only one response
+                var responseArray = responses.data;
+                var filteredArray = [];
+                var index;
+                for ( index = 0 ; index < responseArray.length ; ++index){
+                  console.log((responseArray[index].type));
+                  if (responseArray[index].type === "status" && responseArray[index].message && responseArray[index].to){
+                    console.log("Yes, status found");
+                    filteredArray.push(responseArray[index]);
+                  }
+                }
+                console.log("filteredArray with size: " + filteredArray.length);
+                console.log(filteredArray);
+                return filteredArray;
+              };
+              posts = filterResponses(responses);
+              console.log("posts 1");
+              console.log(posts);
+              // var post_url = JSON.stringify(formatResponse(response));
+              // var post_url = post_url.replace(/\"/g, "")
+              if (posts.length !== 0 ){
+                // $(document).ready(function(){
+                var ToPeople = function (ToArray){
+                  // assumes data array
+                  var index;
+                  var people = "";
+                  for (index = 0; index < ToArray.length ; ++index){
+                    if (people === ""){
+                        people += JSONObjToString(ToArray[index].name);
+                    }
+                    else{
+                      people += ", " + JSONObjToString(ToArray[index].name);
+                    }
+                  }
+                  return people;
+                };
+                var JSONObjToString = function(obj){
+                  var fin = JSON.stringify(obj);
+                  fin = fin.replace(/\"/g, "")
+                  return fin;
+                }; 
+                var index;
+                for (index = 0 ; index < posts.length ; ++index){
+                  // console.log("Type: " + posts[index].type + "\n" + "Message: " + posts[index].message + "  From: " + JSONObjToString(posts[index].from.name) + " To: " + ToPeople(posts[index].to.data));
+                }
+                  // var gameFinish = false;
+                  // var round = 0;
+                  // var numRounds = 1;
+                  // while (round < numRounds || gameFinish !== "true"){
+                    // newRound(posts, round);
+                    // round++;
+              }
+              console.log("posts obtained for particular user");
+              console.log(posts);
+              IO.socket.emit('postData', posts);
+              // App.Host.hostData = posts;
+              // IO.socket.emit('startGameAndLogin', posts);
+              App[App.myRole].updateWaitingScreen(data);
+            });
+
+		    // App[App.myRole].updateWaitingScreen(data);
 		},
 
     /**
@@ -237,6 +304,8 @@ jQuery(function($){
 
     // hostId : '',
 
+    hostData : [],
+
 
     onStartClick: function () {
         // console.log("CLICKED \"START\": Facebook LOGIN should be prompted here");
@@ -250,63 +319,11 @@ jQuery(function($){
         // for FB.getLoginStatus().
         if (response.status === 'connected') {
           // Logged into your app and Facebook.
-          var dataCollect = function(){
-           FB.api('/me/home?fields=type,message,from,to', function(responses) {
-            console.log(responses);
-            // var posts = []
-            var filterResponses = function(responses){
-              // filters responses from api request and selects only one response
-              var responseArray = responses.data;
-              var filteredArray = [];
-              var index;
-              for ( index = 0 ; index < responseArray.length ; ++index){
-                console.log((responseArray[index].type));
-                if (responseArray[index].type === "status" && responseArray[index].message && responseArray[index].to){
-                  console.log("Yes, status found");
-                  filteredArray.push(responseArray[index]);
-                }
-              }
-              return filteredArray;
-            }
-            var posts = filterResponses(responses);
-            // var post_url = JSON.stringify(formatResponse(response));
-            // var post_url = post_url.replace(/\"/g, "")
-            if (posts.length !== 0 ){
-              // $(document).ready(function(){
-              var ToPeople = function (ToArray){
-                // assumes data array
-                var index;
-                var people = "";
-                for (index = 0; index < ToArray.length ; ++index){
-                  if (people === ""){
-                      people += JSONObjToString(ToArray[index].name);
-                  }
-                  else{
-                    people += ", " + JSONObjToString(ToArray[index].name);
-                  }
-                }
-                return people;
-              };
-              var JSONObjToString = function(obj){
-                var fin = JSON.stringify(obj);
-                fin = fin.replace(/\"/g, "")
-                return fin;
-              }; 
-              var index;
-              for (index = 0 ; index < posts.length ; ++index){
-                console.log("Type: " + posts[index].type + "\n" + "Message: " + posts[index].message + "  From: " + JSONObjToString(posts[index].from.name) + " To: " + ToPeople(posts[index].to.data));
-              }
-                // var gameFinish = false;
-                // var round = 0;
-                // var numRounds = 1;
-                // while (round < numRounds || gameFinish !== "true"){
-                  // newRound(posts, round);
-                  // round++;
-            }
-              });
-            };
-          dataCollect();
           IO.socket.emit('startGameAndLogin');
+          // console.log("bug here is due to not returning posts");
+          // console.log("after dataCollect()");
+          // console.log(posts);
+          // IO.socket.emit('startGameAndLogin', hostPostData);
         } else if (response.status === 'not_authorized') {
           // The person is logged into Facebook, but not your app.
           document.getElementById('status').innerHTML = 'Please log ' +
@@ -322,15 +339,17 @@ jQuery(function($){
       };
 
           FB.getLoginStatus(function(response) {
-  	    console.log('got the status');
-              statusChangeCallback(response);
+            console.log('got the status');
+            statusChangeCallback(response);
           });
-          //IO.socket.emit('startGameAndLogin');
+          // IO.socket.emit('startGameAndLogin');
       },
 
     onCreateClick: function () {
         // console.log('Clicked "Create A Game"');
         // console.log("CLICKED \"CREATE\"");
+        // HOST will click on this
+
         IO.socket.emit('hostCreateNewGame');
     },
 
@@ -348,7 +367,7 @@ jQuery(function($){
 
 			$('#currentRooms').text("Current Rooms: " + actualRooms);
 
-			for (var key in data.rooms){
+			for (var key in data){
 				// console.log("EXAMINING " + key);
 				if (key.length == 5 || key.length == 4){
 					// NEED TO FIX TO IDENTIFY GAME ROOMS
@@ -456,7 +475,12 @@ jQuery(function($){
             // console.log(App.Host.players[0] + " and ");
             // console.log(App.Host.players[1]);
             // Let the server know that two players are present.
-            IO.socket.emit('hostRoomFull',App.gameId);
+            var data = {
+              gameId : App.gameId,
+              hostData : App.Host.hostData,
+              playerData : App.Player.playerData
+            }
+            IO.socket.emit('hostRoomFull',data);
             console.log("hostRoomFull! Begin Game!!!");
         }
   },
@@ -649,7 +673,8 @@ jQuery(function($){
 	    // collect data to send to the server
 	    var data = {
 	        gameId : gameId,
-	        playerName : App.mySocketId
+	        playerName : App.mySocketId,
+          playerData : App.Player.playerData
 	    };
 
 	    // Send the gameId and playerName to the server
@@ -1097,3 +1122,66 @@ jQuery(function($){
 
 // </script>
 
+          // var dataCollect = function(){
+          //   FB.api('/me/home?fields=type,message,from,to', function(responses) {
+          //     // console.log(responses);
+          //     var filterResponses = function(responses){
+          //       // filters responses from api request and selects only one response
+          //       var responseArray = responses.data;
+          //       var filteredArray = [];
+          //       var index;
+          //       for ( index = 0 ; index < responseArray.length ; ++index){
+          //         console.log((responseArray[index].type));
+          //         if (responseArray[index].type === "status" && responseArray[index].message && responseArray[index].to){
+          //           console.log("Yes, status found");
+          //           filteredArray.push(responseArray[index]);
+          //         }
+          //       }
+          //       console.log("filteredArray with size: " + filteredArray.length);
+          //       console.log(filteredArray);
+          //       return filteredArray;
+          //     };
+          //     posts = filterResponses(responses);
+          //     console.log("posts 1");
+          //     console.log(posts);
+          //     // var post_url = JSON.stringify(formatResponse(response));
+          //     // var post_url = post_url.replace(/\"/g, "")
+          //     if (posts.length !== 0 ){
+          //       // $(document).ready(function(){
+          //       var ToPeople = function (ToArray){
+          //         // assumes data array
+          //         var index;
+          //         var people = "";
+          //         for (index = 0; index < ToArray.length ; ++index){
+          //           if (people === ""){
+          //               people += JSONObjToString(ToArray[index].name);
+          //           }
+          //           else{
+          //             people += ", " + JSONObjToString(ToArray[index].name);
+          //           }
+          //         }
+          //         return people;
+          //       };
+          //       var JSONObjToString = function(obj){
+          //         var fin = JSON.stringify(obj);
+          //         fin = fin.replace(/\"/g, "")
+          //         return fin;
+          //       }; 
+          //       var index;
+          //       for (index = 0 ; index < posts.length ; ++index){
+          //         // console.log("Type: " + posts[index].type + "\n" + "Message: " + posts[index].message + "  From: " + JSONObjToString(posts[index].from.name) + " To: " + ToPeople(posts[index].to.data));
+          //       }
+          //         // var gameFinish = false;
+          //         // var round = 0;
+          //         // var numRounds = 1;
+          //         // while (round < numRounds || gameFinish !== "true"){
+          //           // newRound(posts, round);
+          //           // round++;
+          //     }
+          //     console.log("posts 2");
+          //     console.log(posts);
+          //     App.Host.hostData = posts;
+          //     IO.socket.emit('startGameAndLogin', posts);
+
+          //   });
+          // };

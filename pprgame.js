@@ -15,6 +15,7 @@ exports.initGame = function(sio, socket){
   gameSocket.on('retrieveRooms', retrieveRooms)
 	gameSocket.on('hostCreateNewGame', hostCreateNewGame);
   gameSocket.on('playerJoinGame', playerJoinGame);
+  gameSocket.on('postData', postData);
   gameSocket.on('hostRoomFull', hostPrepareGame);
   gameSocket.on('hostCountdownFinished', hostStartGame);
   gameSocket.on('chat message', playerMessage);
@@ -33,6 +34,7 @@ exports.initGame = function(sio, socket){
 function startGameAndLogin() {
   //"Start" button clicked on and facebook login prompts login
   //TODO: Facebook Login here
+  // console.log(hostPostData);
 
   //After login success
   this.emit('successfulLogin');
@@ -42,7 +44,16 @@ function startGameAndLogin() {
 function retrieveRooms() {
   console.log("SHOWING ALL ROOMS IN SERVER");
   console.log(gameSocket.adapter.rooms);
-  this.emit('retrievedRooms', {rooms: gameSocket.adapter.rooms});
+  // var data = {
+  //   hostPostData : hostPostData,
+  //   rooms: gameSocket.adapter.rooms
+  // };
+  var data = gameSocket.adapter.rooms;
+  // console.log(data.hostPostData);
+  // fbPostData.push(data.hostPostData);
+  // console.log(fbPostData);
+
+  this.emit('retrievedRooms', data);
 }
 
 /**
@@ -64,12 +75,12 @@ function hostCreateNewGame() {
  * Two players have joined. Alert the host!
  * @param gameId The game ID / room ID
  */
-function hostPrepareGame(gameId) {
+function hostPrepareGame(data) {
     var sock = this;
-    var players = Object.keys(gameSocket.adapter.rooms[gameId]);
+    var players = Object.keys(gameSocket.adapter.rooms[data.gameId]);
     var data = {
         mySocketId : sock.id,
-        gameId : gameId,
+        gameId : data.gameId,
         players : players
     };
     console.log(players);
@@ -136,6 +147,37 @@ function playerJoinGame(data) {
         this.emit('error',{message: "This room does not exist."} );
     }
 }
+var fbPostData = [{word: "hello", answer: "hello"}, {word: "apples", answer: "apples"}];
+function postData(data){
+  //need to append data to the sendWord array
+
+  console.log("BEFORE: fbPostData looks like this: ");
+  console.log(data);
+  var filteredData = reformatData(data);
+  console.log("AFTER:");
+  console.log(filteredData);
+  console.log("end of fbPostData");
+  fbPostData = fbPostData.concat(filteredData);
+  console.log("CURRENT fbPostData");
+  console.log(fbPostData);
+}
+
+/*
+** Take facebook post object and reformats to the correct array for the game
+*/
+function reformatData(data){
+  var array = []
+  var key;
+  for (key = 0; key < data.length ; ++key){
+    console.log(data[key]);
+    var post = {
+      word : data[key].message,
+      answer : data[key].from.name
+    };
+    array.push(post);
+  }
+  return array;
+}
 
 /* *************************
    *                       *
@@ -149,14 +191,26 @@ function playerJoinGame(data) {
  * @param wordPoolIndex
  * @param gameId The room identifier
  */
+
 function sendWord(wordPoolIndex, gameId) {
   // TODO: Put facebook posts in this data array
-    var data = getWordData(wordPoolIndex);
+    // var data = getWordData(wordPoolIndex);
+    var data = getPostData(wordPoolIndex);
     console.log("sendWord to gameId: " + gameId);
         console.log("Current correct answer: " + data.answer);
   // Each round we submit data that includes round, question post, answer
     io.sockets.in(gameId).emit('newWordData', data);
 }
+
+function getPostData(round){
+  var postData = {
+    round: round,
+    word: fbPostData[round].word,
+    answer: fbPostData[round].answer
+  }
+  return postData;
+}
+
 
 /**
  * This function does all the work of getting a new words from the pile
