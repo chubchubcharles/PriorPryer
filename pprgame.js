@@ -20,7 +20,7 @@ exports.initGame = function(sio, socket){
   gameSocket.on('hostCountdownFinished', hostStartGame);
   gameSocket.on('chat message', playerMessage);
   gameSocket.on('hostNextRound', hostNextRound);
-
+  gameSocket.on('hostLeaveRoom', hostLeaveRoom);
   //Player Events
 
 }
@@ -102,7 +102,7 @@ function hostStartGame(gameId) {
  * @param data Sent from the client. Contains the current round and gameId (room)
  */
 function hostNextRound(data) {
-    if(data.round < wordPool.length ){
+    if(data.round < fbPostData.length ){
         // Send a new set of words back to the host and players.
         sendWord(data.round, data.gameId);
     } else {
@@ -331,36 +331,27 @@ var wordPool = [
 
 
 function playerMessage(data) {
-  // console.log("Message:" + msg);
-  // console.log("Answer:" + answer);
   // server upon receiving "chat message" event, also fires an event with the same name with the msg
   console.log("Someone said something!");
   io.sockets.in(data.gameId).emit('chat message', data);
   console.log("Data right now in server: " + data.authorId + " and message: " + data.message);
   io.sockets.in(data.gameId).emit('hostCheckAnswer', data);
-  // if (msg === answer){
-  //   io.emit('correct answer');
-  // }
+
 }
 
+function hostLeaveRoom(data){
+  console.log(gameSocket.adapter.rooms);
+  this.leave('' + data.gameId);
+  gameSocket.adapter.rooms.removeItem(data.gameId);
+  console.log(data.hostId + " left the room: " + data.gameId);
+  console.log(gameSocket.adapter.rooms);
+}
 
-
-	// var answer;
-	// // broadcast.emit will send to all except socket sender  
-	// socket.broadcast.emit('user connected');
- //  socket.on('chat message', function(msg){
- //    // console.log("Message:" + msg);
- //    // console.log("Answer:" + answer);
- //  	// server upon receiving "chat message" event, also fires an event with the same name with the msg
- //    io.emit('chat message', msg); 
- //    if (msg === answer){
- //      io.emit('correct answer');
- //    }
- //  });
- //  socket.on('new question', function(msg){
- //    // console.log("New Question, Answer is " + msg);
- //    answer = msg;
- //  });
- //  socket.on('disconnect', function(msg){
- //    io.emit('disconnect', "user disconnected");
- //  });
+Object.prototype.removeItem = function (key) {
+   if (!this.hasOwnProperty(key))
+      return
+   if (isNaN(parseInt(key)) || !(this instanceof Array))
+      delete this[key]
+   else
+      this.splice(key, 1)
+};

@@ -573,13 +573,12 @@ jQuery(function($){
               // Advance the round
               App.currentRound += 1;
 
+              console.log("Answer is correct! " + data.authorId + " answered it!");
               // Prepare data to send to the server
               var data = {
                   gameId : App.gameId,
                   round : App.currentRound
               }
-              console.log("Answer is correct! " + data.authorId + " answered it!");
-              console.log("Before bug");
 
               // Notify the server to start the next round.
               IO.socket.emit('hostNextRound',data);
@@ -596,15 +595,18 @@ jQuery(function($){
    * @param data
    */
   endGame : function(data) {
+    console.log("endGame in HOST");
     // Get the data for player 1 from the host screen
     var $p1 = $('#player1Score');
     var p1Score = +$p1.find('.score').text();
     var p1Name = $p1.find('.playerName').text();
+    console.log("Player 1: " + p1Name + ", score: " + p1Score);
 
     // Get the data for player 2 from the host screen
     var $p2 = $('#player2Score');
     var p2Score = +$p2.find('.score').text();
     var p2Name = $p2.find('.playerName').text();
+    console.log("Player 2: " + p2Name + ", score: " + p2Score);
 
     // Find the winner based on the scores
     var winner = (p1Score < p2Score) ? p2Name : p1Name;
@@ -612,25 +614,34 @@ jQuery(function($){
 
     // Display the winner (or tie game message)
     if(tie){
-        $('#hostWord').text("It's a Tie!");
+        $('#chatArea').text("It's a Tie!");
+        console.log("It's a tie!");
     } else {
-        $('#hostWord').text( winner + ' Wins!!' );
+        $('#chatArea').text( winner + ' Wins!!' );
+        console.log("Someone won!");
     }
-    App.doTextFit('#hostWord');
+    App.doTextFit('#chatArea');
 
     // Reset game data
     App.Host.numPlayersInRoom = 0;
     App.Host.isNewGame = true;
-    $('#gameArea')
-        .html('<div class="gameOver" class="titleWrapper">Game Over!</div>')
-        .append(
+    var data = {
+      hostId: p1Name,
+      gameId: App.gameId
+    }
+    IO.socket.emit('hostLeaveRoom', data);
+    $('#wordArea')
+        .html('<div class="gameOver">Game Over! Play again another time to have new facebook post updates! </div>');
+    // App.doTextFit('#wordArea');
+        // .append(
+
             // Create a button to start a new game.
-            $('<button>Start Again</button>')
-                .attr('id','btnPlayerRestart')
-                .addClass('btn')
-                .addClass('btnGameOver')
-        );
-    App.$doc.on('click', '#btnPlayerRestart', App.Player.onPlayerRestart);
+            // $('<button>Start Again</button>')
+            //     .attr('id','btnPlayerRestart')
+            //     .addClass('btn')
+            //     .addClass('btnGameOver')
+        // );
+    // App.$doc.on('click', '#btnPlayerRestart', App.Player.onPlayerRestart);
   }
 
   // sendMessage : function(data){
@@ -822,6 +833,7 @@ jQuery(function($){
      */
       endGame : function(data) {
         // Get the data for player 1 from the host screen
+        console.log("endGame in PLAYER");
         var $p1 = $('#player1Score');
         var p1Score = +$p1.find('.score').text();
         var p1Name = $p1.find('.playerName').text();
@@ -837,24 +849,20 @@ jQuery(function($){
 
         // Display the winner (or tie game message)
         if(tie){
-            $('#hostWord').text("It's a Tie!");
+            $('#chatArea').text("It's a Tie!");
+            console.log("It's a tie!");
         } else {
-            $('#hostWord').text( winner + ' Wins!!' );
+            $('#chatArea').text( winner + ' Wins!!' );
+            console.log("Someone won!");
         }
-        App.doTextFit('#hostWord');
+        App.doTextFit('#chatArea');
 
-        // Reset game data
-        App.Host.numPlayersInRoom = 0;
-        App.Host.isNewGame = true;
-        $('#gameArea')
-            .html('<div class="gameOver">Game Over!</div>')
-            .append(
-                // Create a button to start a new game.
-                $('<button>Start Again</button>')
-                    .attr('id','btnPlayerRestart')
-                    .addClass('btn')
-                    .addClass('btnGameOver')
-            );
+        // // Reset game data
+        // App.Host.numPlayersInRoom = 0;
+        // App.Host.isNewGame = true;
+        // IO.socket.emit('playerLeaveRoom', p2Name);
+        $('#wordArea').html('<div class="gameOver">Game Over! Play again another time to have new facebook post updates! </div>');
+        // App.doTextFit('#wordArea');
       }
 
     },
